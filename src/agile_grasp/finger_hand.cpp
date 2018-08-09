@@ -129,7 +129,7 @@ void FingerHand::evaluateGraspParameters(double bite)
 	{
 		fs_sum += finger_spacing_(i) * hand_(i);
 	}
-	double hor_pos = (hand_outer_diameter_ / 2.0) + (fs_sum / hand_.sum());
+	double hor_pos = (hand_outer_diameter_ / 2.0) + (fs_sum / hand_.cast<int>().sum());
 //	std::cout << "fs_sum: " << fs_sum << ", hor_pos: " << hor_pos << ", hand_: "
 //			<< hand_ << "\n";
 	grasp_bottom << hor_pos, points_.row(1).maxCoeff();

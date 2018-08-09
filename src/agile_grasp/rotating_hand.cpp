@@ -12,7 +12,9 @@ RotatingHand::RotatingHand(const Eigen::VectorXd& camera_origin_left,
 	// generate hand orientations
 	int num_orientations = 8;
 	Eigen::VectorXd angles = Eigen::VectorXd::LinSpaced(num_orientations + 1, -1.0 * M_PI, M_PI);
-	angles_ = angles.block(0, 0, 1, num_orientations);
+//    std::cout << "Angles: " << angles << std::endl;
+	angles_ = angles.block(0, 0, num_orientations, 1);
+//    std::cout << "Angles list: " << angles_ << std::endl;
 }
 
 
@@ -95,11 +97,16 @@ std::vector<GraspHypothesis> RotatingHand::evaluateHand(double init_bite, const 
 		y << 0.0, 1.0, 0.0;
 		Eigen::Vector3d approach = frame_ * rot.transpose() * y;
 
+//        std::cout << "***********************\napproach: " << approach << std::endl;
+//        std::cout << "cams: " << cams_.col(0) << std::endl;
+//        std::cout << "check 1: " << approach.dot(cams_.col(0)) << ", check 2: " << approach.dot(cams_.col(1)) << std::endl;
+
 		// reject hand if it is not within 90 degrees of one of the camera sources
 		if (approach.dot(cams_.col(0)) > 0 && approach.dot(cams_.col(1)) > 0)
 		{
 			continue;
 		}
+//        std::cout << "passed camera source check" << std::endl;
 
 		Eigen::Vector3d binormal = frame_ * rot.transpose() * x;
 
@@ -108,7 +115,7 @@ std::vector<GraspHypothesis> RotatingHand::evaluateHand(double init_bite, const 
 		finger_hand_.evaluateFingers(init_bite);
 		finger_hand_.evaluateHand();
 
-		if (finger_hand_.getHand().sum() > 0)
+		if ((finger_hand_.getHand()).cast<int>().sum() > 0)
 		{
 			// find deepest hand
 			finger_hand_.deepenHand(init_bite, finger_hand_.getHandDepth());

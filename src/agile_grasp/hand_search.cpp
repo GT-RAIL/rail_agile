@@ -117,6 +117,13 @@ std::vector<GraspHypothesis> HandSearch::findHands(const PointCloud::Ptr cloud,
 	const Eigen::VectorXi& pts_cam_source, const std::vector<Quadric>& quadric_list,
 	const Eigen::VectorXi& hands_cam_source, const pcl::KdTreeFLANN<pcl::PointXYZ>& kdtree)
 {
+//	std::cout << "********************************\n" << "Hand search parameters: " << std::endl;
+//	std::cout << "Point cloud size: " << cloud->points.size() << std::endl;
+//	std::cout << "pts_cam_source size: " << pts_cam_source.rows() << " x " << pts_cam_source.cols() << std::endl;
+//	std::cout << "quadric_lsit size: " << quadric_list.size() << std::endl;
+//	std::cout << "hands_cam_source size: " << hands_cam_source.rows() << " x " << hands_cam_source.cols() << std::endl;
+//	std::cout << "kdtree size: " << kdtree.getInputCloud()->points.size() << std::endl;
+
 	double t1 = omp_get_wtime();
 	std::vector<int> nn_indices;
 	std::vector<float> nn_dists;

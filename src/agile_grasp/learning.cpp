@@ -165,84 +165,84 @@ void Learning::train(const std::vector<GraspHypothesis>& hands_list, const std::
 std::vector<GraspHypothesis> Learning::classify(const std::vector<GraspHypothesis>& hands_list,
 	const std::string& svm_filename, const Eigen::Matrix3Xd& cam_pos, bool is_plotting)
 {
-	std::cout << "Predicting ...\n";
+//	std::cout << "Predicting ...\n";
   std::vector<GraspHypothesis> antipodal_hands(0);
-	
-	// check if SVM file exists
-	ifstream f(svm_filename.c_str());
-	if (!f.good()) 
-	{
-		f.close();
-		std::cout << " Error: File " << svm_filename << " does not exist!\n";
-		return antipodal_hands;
-	}
-		
-	// load the SVM model from the file
-	CvSVM svm;
-	double t0 = omp_get_wtime();
-	try
-	{
-		svm.load(svm_filename.c_str());
-	}
-	catch (cv::Exception& e)
-	{
-		std::cout << " Exception: " << e.msg << "\n";
-		return antipodal_hands;
-	}
-	std::cout << " time for loading SVM: " << omp_get_wtime() - t0 << "\n";
-  std::cout << " # of support vectors: " << svm.get_support_vector_count() << "\n";
-	cv::HOGDescriptor hog;
-	hog.winSize = cv::Size(64, 64);
-	std::vector<bool> is_antipodal(hands_list.size());
-
-#ifdef _OPENMP // parallelization using OpenMP
-#pragma omp parallel for num_threads(num_threads_)
-#endif
-	for (int i = 0; i < hands_list.size(); i++)
-	{
-		const Eigen::Vector3d& source = cam_pos.col(hands_list[i].getCamSource());
-		Eigen::Vector3d source_to_center = hands_list[i].getGraspSurface() - source;
-
-		// convert grasp to image
-		cv::Mat image = convertToImage(createInstance(hands_list[i], cam_pos));
-
-		if (is_plotting)
-		{
-			cv::namedWindow("Grasp Image", cv::WINDOW_NORMAL); // Create a window for display.
-			cv::imshow("Grasp Image", image); // Show our image inside it.
-			cv::waitKey(0); // Wait for a keystroke in the window
-		}
-
-		// extract HOG features from image
-		//    hog.cellSize = cv::Size(8,8);
-		std::vector<float> descriptors;
-		std::vector<cv::Point> locations;
-		hog.compute(image, descriptors, cv::Size(32, 32), cv::Size(0, 0), locations);
-
-		cv::Mat features(1, hog.getDescriptorSize() * 2, CV_32FC1);
-		for (int k = 0; k < descriptors.size(); k++)
-			features.at<float>(k) = descriptors[k];
-		float prediction = svm.predict(features);
-		if (prediction == 1)
-		{
-			GraspHypothesis grasp = hands_list[i];
-			grasp.setFullAntipodal(true);
-      is_antipodal[i] = true;
-		}
-    else
-      is_antipodal[i] = false;
-	}
-
-  for (int i = 0; i < is_antipodal.size(); i++)
-  {
-    if (is_antipodal[i])
-    {
-      antipodal_hands.push_back(hands_list[i]);
-      antipodal_hands[antipodal_hands.size()-1].setFullAntipodal(true);
-    }
-  }
-
-  std::cout << " " << antipodal_hands.size() << " antipodal grasps found.\n";
+//
+//	// check if SVM file exists
+//	ifstream f(svm_filename.c_str());
+//	if (!f.good())
+//	{
+//		f.close();
+//		std::cout << " Error: File " << svm_filename << " does not exist!\n";
+//		return antipodal_hands;
+//	}
+//
+//	// load the SVM model from the file
+//	CvSVM svm;
+//	double t0 = omp_get_wtime();
+//	try
+//	{
+//		svm.load(svm_filename.c_str());
+//	}
+//	catch (cv::Exception& e)
+//	{
+//		std::cout << " Exception: " << e.msg << "\n";
+//		return antipodal_hands;
+//	}
+//	std::cout << " time for loading SVM: " << omp_get_wtime() - t0 << "\n";
+//  std::cout << " # of support vectors: " << svm.get_support_vector_count() << "\n";
+//	cv::HOGDescriptor hog;
+//	hog.winSize = cv::Size(64, 64);
+//	std::vector<bool> is_antipodal(hands_list.size());
+//
+//#ifdef _OPENMP // parallelization using OpenMP
+//#pragma omp parallel for num_threads(num_threads_)
+//#endif
+//	for (int i = 0; i < hands_list.size(); i++)
+//	{
+//		const Eigen::Vector3d& source = cam_pos.col(hands_list[i].getCamSource());
+//		Eigen::Vector3d source_to_center = hands_list[i].getGraspSurface() - source;
+//
+//		// convert grasp to image
+//		cv::Mat image = convertToImage(createInstance(hands_list[i], cam_pos));
+//
+//		if (is_plotting)
+//		{
+//			cv::namedWindow("Grasp Image", cv::WINDOW_NORMAL); // Create a window for display.
+//			cv::imshow("Grasp Image", image); // Show our image inside it.
+//			cv::waitKey(0); // Wait for a keystroke in the window
+//		}
+//
+//		// extract HOG features from image
+//		//    hog.cellSize = cv::Size(8,8);
+//		std::vector<float> descriptors;
+//		std::vector<cv::Point> locations;
+//		hog.compute(image, descriptors, cv::Size(32, 32), cv::Size(0, 0), locations);
+//
+//		cv::Mat features(1, hog.getDescriptorSize() * 2, CV_32FC1);
+//		for (int k = 0; k < descriptors.size(); k++)
+//			features.at<float>(k) = descriptors[k];
+//		float prediction = svm.predict(features);
+//		if (prediction == 1)
+//		{
+//			GraspHypothesis grasp = hands_list[i];
+//			grasp.setFullAntipodal(true);
+//      is_antipodal[i] = true;
+//		}
+//    else
+//      is_antipodal[i] = false;
+//	}
+//
+//  for (int i = 0; i < is_antipodal.size(); i++)
+//  {
+//    if (is_antipodal[i])
+//    {
+//      antipodal_hands.push_back(hands_list[i]);
+//      antipodal_hands[antipodal_hands.size()-1].setFullAntipodal(true);
+//    }
+//  }
+//
+//  std::cout << " " << antipodal_hands.size() << " antipodal grasps found.\n";
 	return antipodal_hands;
 }
 
@@ -250,71 +250,71 @@ void Learning::convertData(const std::vector<Instance>& instances,
   const std::string& file_name, bool is_plotting, 
   bool uses_linear_kernel)
 {
-	std::vector<cv::Mat> image_list;
-	cv::HOGDescriptor hog;
-	hog.winSize = cv::Size(64, 64);
-	cv::Mat features(instances.size(), hog.getDescriptorSize() * 2, CV_32FC1);
-	cv::Mat labels(instances.size(), 1, CV_32FC1);
-	int num_positives = 0;
-
-	for (int i = 0; i < instances.size(); i++)
-	{
-		// convert grasp to image
-//		std::cout << "i: " << i << "\n";
-		cv::Mat image = convertToImage(instances[i]);
-//		std::cout << " Converted grasp data to image\n";
-		image_list.push_back(image);
-
-		// visualize grasp image
-		if (is_plotting)
-		{
-			cv::namedWindow("Grasp Image", cv::WINDOW_NORMAL); // Create a window for display.
-			cv::imshow("Grasp Image", image); // Show our image inside it.
-			cv::waitKey(0); // Wait for a keystroke in the window
-		}
-
-		// extract HOG features from image
-//    hog.cellSize = cv::Size(8,8);
-		std::vector<float> descriptors;
-		std::vector<cv::Point> locations;
-//		std::cout << "HOG descriptor size is " << hog.getDescriptorSize() << std::endl;
-		hog.compute(image, descriptors, cv::Size(32, 32), cv::Size(0, 0), locations);
-//		std::cout << "HOG descriptor size is " << hog.getDescriptorSize() << std::endl;
-//		std::cout << "# descriptors = " << descriptors.size() << std::endl;
-		for (int j = 0; j < features.cols; ++j)
-		{
-			features.at<float>(i, j) = descriptors[j];
-		}
-		if (instances[i].label == 1)
-		{
-			labels.at<float>(i, 0) = 1.0;
-			num_positives++;
-		}
-		else
-			labels.at<float>(i, 0) = -1.0;
-	}
-
-  // train the SVM
-	CvSVMParams params;
-  // cv::Mat weights(1, 2, CV_32FC1);
-  // weights.at<float>(0,0) = 0.9;
-  // weights.at<float>(0,1) = 0.1;
-  // CvMat cv1_weights = weights;  
-  // params.class_weights = &cv1_weights;
-	params.svm_type = CvSVM::C_SVC;
-  if (uses_linear_kernel)
-    params.kernel_type = CvSVM::LINEAR;
-  else
-  {
-    params.kernel_type = CvSVM::POLY;
-    params.degree = 2;
-	}
-  CvSVM svm;
-	svm.train(features, labels, cv::Mat(), cv::Mat(), params);
-	svm.save(file_name.c_str());
-	std::cout << "# training examples: " << features.rows << " (# positives: " << num_positives
-			<< ", # negatives: " << features.rows - num_positives << ")\n";
-	std::cout << "Saved trained SVM as " << file_name << "\n";
+//	std::vector<cv::Mat> image_list;
+//	cv::HOGDescriptor hog;
+//	hog.winSize = cv::Size(64, 64);
+//	cv::Mat features(instances.size(), hog.getDescriptorSize() * 2, CV_32FC1);
+//	cv::Mat labels(instances.size(), 1, CV_32FC1);
+//	int num_positives = 0;
+//
+//	for (int i = 0; i < instances.size(); i++)
+//	{
+//		// convert grasp to image
+////		std::cout << "i: " << i << "\n";
+//		cv::Mat image = convertToImage(instances[i]);
+////		std::cout << " Converted grasp data to image\n";
+//		image_list.push_back(image);
+//
+//		// visualize grasp image
+//		if (is_plotting)
+//		{
+//			cv::namedWindow("Grasp Image", cv::WINDOW_NORMAL); // Create a window for display.
+//			cv::imshow("Grasp Image", image); // Show our image inside it.
+//			cv::waitKey(0); // Wait for a keystroke in the window
+//		}
+//
+//		// extract HOG features from image
+////    hog.cellSize = cv::Size(8,8);
+//		std::vector<float> descriptors;
+//		std::vector<cv::Point> locations;
+////		std::cout << "HOG descriptor size is " << hog.getDescriptorSize() << std::endl;
+//		hog.compute(image, descriptors, cv::Size(32, 32), cv::Size(0, 0), locations);
+////		std::cout << "HOG descriptor size is " << hog.getDescriptorSize() << std::endl;
+////		std::cout << "# descriptors = " << descriptors.size() << std::endl;
+//		for (int j = 0; j < features.cols; ++j)
+//		{
+//			features.at<float>(i, j) = descriptors[j];
+//		}
+//		if (instances[i].label == 1)
+//		{
+//			labels.at<float>(i, 0) = 1.0;
+//			num_positives++;
+//		}
+//		else
+//			labels.at<float>(i, 0) = -1.0;
+//	}
+//
+//  // train the SVM
+//	CvSVMParams params;
+//  // cv::Mat weights(1, 2, CV_32FC1);
+//  // weights.at<float>(0,0) = 0.9;
+//  // weights.at<float>(0,1) = 0.1;
+//  // CvMat cv1_weights = weights;
+//  // params.class_weights = &cv1_weights;
+//	params.svm_type = CvSVM::C_SVC;
+//  if (uses_linear_kernel)
+//    params.kernel_type = CvSVM::LINEAR;
+//  else
+//  {
+//    params.kernel_type = CvSVM::POLY;
+//    params.degree = 2;
+//	}
+//  CvSVM svm;
+//	svm.train(features, labels, cv::Mat(), cv::Mat(), params);
+//	svm.save(file_name.c_str());
+//	std::cout << "# training examples: " << features.rows << " (# positives: " << num_positives
+//			<< ", # negatives: " << features.rows - num_positives << ")\n";
+//	std::cout << "Saved trained SVM as " << file_name << "\n";
 }
 
 cv::Mat Learning::convertToImage(const Instance& ins)
