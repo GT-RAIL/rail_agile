@@ -9,11 +9,11 @@ run the AGILE pipeline with the new action server.  For more information on the 
 This node exposes action servers for executing either just antipodal grasp sampling (without classification), or the
 full AGILE pipeline (with classification).  Relevant parameters, action servers, topics, and services are as follows:
  * **Action Servers**
-   * `/rail_agile/sample_grasps`([rail_grasp_calculation_msgs/SampleGraspsAction](https://github.com/GT-RAIL/rail_grasp_calculation/blob/master/rail_grasp_calculation_msgs/action/SampleGrasps.action))  
+   * `/rail_agile/sample_grasps`([rail_grasp_calculation_msgs/SampleGraspsAction](https://github.com/GT-RAIL/rail_grasp_calculation/blob/kinetic-devel/rail_grasp_calculation_msgs/action/SampleGrasps.action))  
  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sample grasps over a point cloud within a given workspace.  Requires a point cloud
  and workspace as input.  Returns a list of antipodal grasps, unclustered and not passed through AGILE's SVM classifier.
  This will result in a large list of potential antipodal grasps.
-   * `/rail_agile/sample_classify_grasps`([rail_grasp_calculation_msgs/SampleGraspsAction](https://github.com/GT-RAIL/rail_grasp_calculation/blob/master/rail_grasp_calculation_msgs/action/SampleGrasps.action))  
+   * `/rail_agile/sample_classify_grasps`([rail_grasp_calculation_msgs/SampleGraspsAction](https://github.com/GT-RAIL/rail_grasp_calculation/blob/kinetic-devel/rail_grasp_calculation_msgs/action/SampleGrasps.action))  
  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Sample grasps over a point cloud within a given workspace, using the full AGILE
  pipeline.  Requires a point cloud and workspace as input.  Returns a list of antipodal grasps, clustered and passed
  through AGILE's SVM classifier.  This will result in a small list of grasps that are more likely to be antipodal.
